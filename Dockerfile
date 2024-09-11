@@ -12,8 +12,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     python3 -m pip install --upgrade -r /requirements.txt
 
 # Install vLLM (switching back to pip installs since issues that required building fork are fixed and space optimization is not as important since caching) and FlashInfer 
-RUN python3 -m pip install vllm==0.5.5 && \
-    python3 -m pip install flashinfer -i https://flashinfer.ai/whl/cu121/torch2.3
+RUN git clone --depth=1 https://github.com/supa-thibaud/vllm-dry.git \
+    && cd vllm-dry \
+    && python3 -m pip --no-cache-dir install -e . \
+    python3 -m pip install flashinfer -i https://flashinfer.ai/whl/cu121/torch2.4
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
