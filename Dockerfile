@@ -1,7 +1,9 @@
-FROM nvidia/cuda:12.1.0-base-ubuntu22.04 
+ARG CUDA_VERSION=12.4.1
+FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu20.04
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y \
-    && apt-get install -y python3-pip
+    && apt-get install -y python3-pip python3-dev
 
 RUN ldconfig /usr/local/cuda-12.1/compat/
 
@@ -12,11 +14,14 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     apt install curl git sudo -y && \
     python3 -m pip install --upgrade -r /requirements.txt
 
-# Install vLLM (switching back to pip installs since issues that required building fork are fixed and space optimization is not as important since caching) and FlashInfer 
+# Install NumPy and other necessary packages
+RUN python3 -m pip install numpy torch
+
+# Install vLLM and FlashInfer
 RUN git clone --depth=1 https://github.com/supa-thibaud/vllm-dry.git \
     && cd vllm-dry \
-    && python3 -m pip --no-cache-dir install -e . \
-    && python3 -m pip install flashinfer -i https://flashinfer.ai/whl/cu121/torch2.4
+    && CUDA_HOME=/usr/local/cuda python3 -m pip --no-cache-dir install -e . \
+    && python3 -m pip install flashinfer -i https://flashinfer.ai/whl/cu124/torch2.4
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
