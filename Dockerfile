@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
     && apt-get install -y python3-pip python3-dev
  
-RUN ldconfig /usr/local/cuda-12.1/compat/
+RUN ldconfig /usr/local/cuda-12.4/compat/
 
 # Install Python dependencies
 COPY builder/requirements.txt /requirements.txt
